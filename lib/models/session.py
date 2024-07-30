@@ -1,4 +1,5 @@
 import sqlite3
+import re
 
 CONN = sqlite3.connect('database.db')
 
@@ -6,14 +7,48 @@ CURSOR = CONN.cursor()
 from helper import Helper
 
 class Session(Helper):
-    all_ ={}
+    all_ = {}
     def __init__(self, date, time, client_id, trainer_id, id=None):
         self.date = date
         self.time = time
         self.client_id = client_id
         self.trainer_id = trainer_id
         self.id = id
-        
+    
+    def __repr__(self):
+        return f"""Session {self.id}: {self.date} @{self.time}
+                Trainer ID: {self.trainer_id}
+                Client ID: {self.client_id}
+                """
+    
+    @property
+    def date(self):
+        return self._date
+
+    @date.setter
+    def date(self, date):
+        if not isinstance(date, str):
+            raise TypeError("Date must be a string")
+        elif not re.match(
+            r"([0][1-9]|[1][0-2])\/([0][1-9]|[12][0-9]|[3][01])\/\d{4}", date
+        ):
+            raise ValueError("Date must be in format MM/DD/YYYY")
+        else:
+            self._date = date
+
+    @property
+    def time(self):
+        return self._time
+
+    @time.setter
+    def time(self, time):
+        if not isinstance(time, str):
+            raise TypeError("Time must be a string")
+        elif not re.match(r"([0][0-9]|[1][0-2]):[0-5][0-9](AM|PM)", time):
+            raise ValueError("Time must be in format HH:MM AM or HH:MM PM")
+        else:
+            self._time = time
+    
     @classmethod
     def create_table(cls):
         try:

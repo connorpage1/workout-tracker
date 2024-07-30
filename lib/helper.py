@@ -1,7 +1,6 @@
 # Code from ORM lecture to turn class names into lowercase db names 
 import re
-class Helper:
-    
+class Helper:        
     @classmethod
     def pascal_to_camel_plural(cls):
         # Use regex to split the class name at capital letters

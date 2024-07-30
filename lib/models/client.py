@@ -1,4 +1,5 @@
 import sqlite3
+import re
 
 CONN = sqlite3.connect('database.db')
 
@@ -12,7 +13,11 @@ class Client(Helper):
         self.last_name = last_name
         self.email = email
         self.id = id
-        
+    
+    def __repr__(self):
+        return f"<Client {self.id}: {self.first_name} {self.last_name}, {self.email}>"
+    
+    # Attributes and properties
     @property
     def first_name(self):
         return self._first_name
@@ -21,9 +26,37 @@ class Client(Helper):
     def first_name(self, new_name):
         if type(new_name) is not str:
             raise TypeError("Name must be a string")
-        elif not new_name:
-            raise ValueError("Names must be at least 1 character long")
+        elif not re.match(r"[A-z-]{1,50}", new_name):
+            raise ValueError("Names must be between 1 and 50 characters and can only consist of letters and dashes")
+        else:
+            self._first_name = new_name
 
+    
+    @property
+    def last_name(self):
+        return self._last_name
+
+    @last_name.setter
+    def last_name(self, new_name):
+        if type(new_name) is not str:
+            raise TypeError("Name must be a string")
+        elif not re.match(r"[A-z-]{1,50}", new_name):
+            raise ValueError("Names must be between 1 and 50 characters and can only consist of letters and dashes")
+        else:
+            self._last_name = new_name
+    
+    @property
+    def email(self):
+        return self._email
+    
+    @email.setter
+    def email(self, new_email):
+        if not isinstance(new_email, str):
+            raise TypeError("Email must be a string")
+        elif not re.match(r"^[\w\.-]+@+[\w-]+\.+[\w\.]{2,}", new_email):
+            raise ValueError("Emails must be in the format you@domain.com")
+        else:
+            self._email = new_email
     @classmethod
     def create_table(cls):
         try:

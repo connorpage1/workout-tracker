@@ -1,5 +1,6 @@
 import sqlite3
 from helper import Helper
+import re
 
 CONN = sqlite3.connect('database.db')
 
@@ -13,6 +14,48 @@ class Trainer(Helper):
         self.specialty = specialty
         self.id = id
     
+    def __repr__(self):
+        return f"<Trainer {self.id}: {self.first_name} {self.last_name}, Specialty: {self.specialty}>"
+    
+    @property
+    def first_name(self):
+        return self._first_name
+    
+    @first_name.setter
+    def first_name(self, new_name):
+        if not isinstance(new_name, str):
+            raise TypeError("Name must be a string")
+        elif not re.match(r"[A-z-]{1,50}", new_name):
+            raise ValueError("Names must be between 1 and 50 characters and can only consist of letters and dashes")
+        else:
+            self._first_name = new_name
+
+    
+    @property
+    def last_name(self):
+        return self._last_name
+
+    @last_name.setter
+    def last_name(self, new_name):
+        if not isinstance(new_name, str):
+            raise TypeError("Name must be a string")
+        elif not re.match(r"[A-z-]{1,50}", new_name):
+            raise ValueError("Names must be between 1 and 50 characters and can only consist of letters and dashes")
+        else:
+            self._last_name = new_name
+    
+    @property
+    def specialty(self):
+        return self._specialty
+    
+    
+    @specialty.setter
+    def specialty(self, new_specialty):
+        if not isinstance(new_specialty, str):
+            raise TypeError("Specialty must be a string")
+        else:
+            self._specialty = new_specialty
+        
     @classmethod
     def create_table(cls):
         try:
