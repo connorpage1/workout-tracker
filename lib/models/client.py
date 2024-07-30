@@ -26,8 +26,8 @@ class Client(Helper):
     def first_name(self, new_name):
         if type(new_name) is not str:
             raise TypeError("Name must be a string")
-        elif not re.match(r"[A-z-]{1,50}", new_name):
-            raise ValueError("Names must be between 1 and 50 characters and can only consist of letters and dashes")
+        elif not re.match(r"^[A-z-]{1,50}$", new_name):
+            raise ValueError("First name must be between 1 and 50 characters and can only consist of letters and dashes")
         else:
             self._first_name = new_name
 
@@ -40,8 +40,8 @@ class Client(Helper):
     def last_name(self, new_name):
         if type(new_name) is not str:
             raise TypeError("Name must be a string")
-        elif not re.match(r"[A-z-]{1,50}", new_name):
-            raise ValueError("Names must be between 1 and 50 characters and can only consist of letters and dashes")
+        elif not re.match(r"^[A-z-]{1,50}$", new_name):
+            raise ValueError("Last name must be between 1 and 50 characters and can only consist of letters and dashes")
         else:
             self._last_name = new_name
     
@@ -53,7 +53,7 @@ class Client(Helper):
     def email(self, new_email):
         if not isinstance(new_email, str):
             raise TypeError("Email must be a string")
-        elif not re.match(r"^[\w\.-]+@+[\w-]+\.+[\w\.]{2,}", new_email):
+        elif not re.match(r"^[\w\.-]+@+[\w-]+\.+[\w\.]{2,}$", new_email):
             raise ValueError("Emails must be in the format you@domain.com")
         else:
             self._email = new_email
@@ -83,6 +83,40 @@ class Client(Helper):
                 )
         except sqlite3.IntegrityError as e:
             return e
+    @classmethod
+    def create(cls, first_name, last_name, email):
+        new_client = cls(first_name, last_name, email)
+        
+        # Save to db
+        new_client.save()
+        
+        return new_client
+    
+    @classmethod
+    def find_by_id(cls, id):
+        CURSOR.execute(
+            """
+            SELECT * FROM clients
+            WHERE id is ?;
+        """,
+            (id,),
+        )
+        row = CURSOR.fetchone()
+        return cls(row[1], row[2], row[3], row[0]) if row else None
+    
+    def update(self):
+        CURSOR.execute(
+            """
+            UPDATE clients
+            SET first_name = ?, last_name = ?, email = ?
+            WHERE id = ?
+        """,
+            (self.first_name, self.last_name, self.email, self.id),
+        )
+        CONN.commit()
+        type(self).all[self] = self
+        return self
+    
     
     def save(self):
         try:
@@ -97,5 +131,6 @@ class Client(Helper):
                 )
                 self.id = CURSOR.lastrowid
                 type(self).all_[self.id] = self
+                return self
         except sqlite3.IntegrityError as e:
             return e    

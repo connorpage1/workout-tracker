@@ -25,8 +25,8 @@ class Trainer(Helper):
     def first_name(self, new_name):
         if not isinstance(new_name, str):
             raise TypeError("Name must be a string")
-        elif not re.match(r"[A-z-]{1,50}", new_name):
-            raise ValueError("Names must be between 1 and 50 characters and can only consist of letters and dashes")
+        elif not re.match(r"^[A-z-]{1,50}$", new_name):
+            raise ValueError("First name must be between 1 and 50 characters and can only consist of letters and dashes")
         else:
             self._first_name = new_name
 
@@ -39,8 +39,8 @@ class Trainer(Helper):
     def last_name(self, new_name):
         if not isinstance(new_name, str):
             raise TypeError("Name must be a string")
-        elif not re.match(r"[A-z-]{1,50}", new_name):
-            raise ValueError("Names must be between 1 and 50 characters and can only consist of letters and dashes")
+        elif not re.match(r"^[A-z-]{1,50}$", new_name):
+            raise ValueError("Last name must be between 1 and 50 characters and can only consist of letters and dashes")
         else:
             self._last_name = new_name
     
@@ -81,6 +81,40 @@ class Trainer(Helper):
                 
         except sqlite3.IntegrityError as e:
             return e
+        
+    @classmethod
+    def create(cls, first_name, last_name, specialty):
+        new_trainer = cls(first_name, last_name, specialty)
+        
+        # Save to db
+        new_trainer.save()
+        
+        return new_trainer
+    
+    @classmethod
+    def find_by_id(cls, id):
+        CURSOR.execute(
+            """
+            SELECT * FROM clients
+            WHERE id is ?;
+        """,
+            (id,),
+        )
+        row = CURSOR.fetchone()
+        return cls(row[1], row[2], row[3], row[0]) if row else None
+    
+    def update(self):
+        CURSOR.execute(
+            """
+            UPDATE clients
+            SET first_name = ?, last_name = ?, specialty = ?
+            WHERE id = ?
+        """,
+            (self.first_name, self.last_name, self.specialty, self.id),
+        )
+        CONN.commit()
+        type(self).all[self] = self
+        return self
     def save(self):
         try:
             with CONN:

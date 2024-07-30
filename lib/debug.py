@@ -18,8 +18,9 @@ if __name__ == "__main__":
 
     connor = Client("Connor", "Page", "connorpage@protonmail.com")
     connor.save()
+    connor2 = Client.create("Bill", "Test", "connorpage@protonmail.com")
     trainer = Trainer("Bill", "Whetherspoon", "Strength")
     trainer.save()
-    session = Session("11/11/2024", "9:00 PM", connor.id, trainer.id)
+    session = Session("11/11/2024", "09:00PM", connor.id, trainer.id)
     session.save()
     ipdb.set_trace()
