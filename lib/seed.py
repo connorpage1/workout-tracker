@@ -36,7 +36,7 @@ if __name__ == "__main__":
     for _ in range(50):
         Trainer.create(fake.first_name(), fake.last_name(), random.choice(trainer_specialties))
     
-    for _ in range(10):
+    for _ in range(100):
         try:
             clients = Client.get_all()
             trainers = Trainer.get_all()
@@ -48,6 +48,6 @@ if __name__ == "__main__":
                 random.sample(clients, 1)[0].id,
                 random.sample(trainers, 1)[0].id
             )
-            print("Created appointment")
+            print("Created session")
         except Exception as e:
-            print("Failed to create appointment because of error: ", e)
+            print("Failed to create session because of error: ", e)

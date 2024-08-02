@@ -13,6 +13,7 @@ class Trainer(Helper):
         self.last_name = last_name
         self.specialty = specialty
         self.id = id
+        type(self).all_[self.id] = self
     
     def __repr__(self):
         return f"<Trainer {self.id}: {self.first_name} {self.last_name}, Specialty: {self.specialty}>"
@@ -171,7 +172,7 @@ class Trainer(Helper):
             (self.first_name, self.last_name, self.specialty, self.id),
         )
         CONN.commit()
-        type(self).all[self] = self
+        type(self).all_[self] = self
         return self
     
     def save(self):
@@ -191,6 +192,8 @@ class Trainer(Helper):
             raise e
         
     def delete(self):
+        for session in self.sessions():
+            session.delete()
         CURSOR.execute(
             """
             DELETE FROM trainers
@@ -199,7 +202,7 @@ class Trainer(Helper):
             (self.id,),
         )
         CONN.commit()
-        del type(self).all[self.id]
+        del type(self).all_[self.id]
         self.id = None
         return self
 

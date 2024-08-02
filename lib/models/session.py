@@ -14,6 +14,7 @@ class Session(Helper):
         self.client_id = client_id
         self.trainer_id = trainer_id
         self.id = id
+        type(self).all_[self.id] = self
     
     def __repr__(self):
         return f"""Session {self.id}: {self.date} @ {self.time}
@@ -208,7 +209,7 @@ class Session(Helper):
         )
         CONN.commit()
         #! Remove memoized object
-        del type(self).all[self.id]
+        del type(self).all_[self.id]
         #! Nullify id
         self.id = None
         return self

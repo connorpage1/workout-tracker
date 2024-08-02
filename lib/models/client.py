@@ -13,6 +13,7 @@ class Client(Helper):
         self.last_name = last_name
         self.email = email
         self.id = id
+        type(self).all_[self.id] = self
     
     def __repr__(self):
         return f"<Client {self.id}: {self.first_name} {self.last_name}, {self.email}>"
@@ -193,6 +194,8 @@ class Client(Helper):
             raise e  
         
     def delete(self):
+        for session in self.sessions():
+            session.delete()
         CURSOR.execute(
             """
             DELETE FROM clients
@@ -201,7 +204,7 @@ class Client(Helper):
             (self.id,),
         )
         CONN.commit()
-        del type(self).all[self.id]
+        del type(self).all_[self.id]
         self.id = None
         return self
 
