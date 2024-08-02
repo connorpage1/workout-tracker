@@ -17,6 +17,9 @@ class Client(Helper):
     def __repr__(self):
         return f"<Client {self.id}: {self.first_name} {self.last_name}, {self.email}>"
     
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+    
     # Attributes and properties
     @property
     def first_name(self):
@@ -131,7 +134,7 @@ class Client(Helper):
     def find_by_name(cls, first_name, last_name):
         CURSOR.execute(
             """
-            SELECT * FROM doctors
+            SELECT * FROM clients
             WHERE first_name is ? 
             AND last_name is ?;
         """,
@@ -168,7 +171,7 @@ class Client(Helper):
             (self.first_name, self.last_name, self.email, self.id),
         )
         CONN.commit()
-        type(self).all[self] = self
+        type(self).all_[self] = self
         return self
     
     
@@ -192,7 +195,7 @@ class Client(Helper):
     def delete(self):
         CURSOR.execute(
             """
-            DELETE FROM doctors
+            DELETE FROM clients
             WHERE id = ?
         """,
             (self.id,),
@@ -203,4 +206,4 @@ class Client(Helper):
         return self
 
 
-from session import Session
+from models.session import Session

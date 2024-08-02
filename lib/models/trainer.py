@@ -44,6 +44,9 @@ class Trainer(Helper):
         else:
             self._last_name = new_name
     
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+    
     @property
     def specialty(self):
         return self._specialty
@@ -67,8 +70,8 @@ class Trainer(Helper):
         rows = CURSOR.fetchall()
         return [Session(row[1], row[2], row[3], row[4], row[0]) for row in rows]    
     
-    def patients(self):
-        return list({session.patient() for session in self.sessions()})
+    def clients(self):
+        return list({session.client() for session in self.sessions()})
     
     @classmethod
     def create_table(cls):
@@ -131,7 +134,7 @@ class Trainer(Helper):
     def find_by_name(cls, first_name, last_name):
         CURSOR.execute(
             """
-            SELECT * FROM doctors
+            SELECT * FROM trainers
             WHERE first_name is ?
             AND last_name is ?;
         """,
@@ -186,5 +189,19 @@ class Trainer(Helper):
                 type(self).all_[self.id] = self
         except sqlite3.IntegrityError as e:
             raise e
+        
+    def delete(self):
+        CURSOR.execute(
+            """
+            DELETE FROM trainers
+            WHERE id = ?
+        """,
+            (self.id,),
+        )
+        CONN.commit()
+        del type(self).all[self.id]
+        self.id = None
+        return self
 
-from session import Session
+
+from models.session import Session

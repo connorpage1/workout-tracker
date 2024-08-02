@@ -16,9 +16,9 @@ class Session(Helper):
         self.id = id
     
     def __repr__(self):
-        return f"""Session {self.id}: {self.date} @{self.time}
-                Trainer ID: {self.trainer_id}
-                Client ID: {self.client_id}
+        return f"""Session {self.id}: {self.date} @ {self.time}
+                Trainer: {Trainer.find_by_id(self.trainer_id).full_name()}
+                Client: {Client.find_by_id(self.client_id).full_name()}
                 """
     
     @property
@@ -44,7 +44,7 @@ class Session(Helper):
     def time(self, time):
         if not isinstance(time, str):
             raise TypeError("Time must be a string")
-        elif not re.match(r"([0][0-9]|[1][0-2]):[0-5][0-9](AM|PM)", time):
+        elif not re.match(r"([0][0-9]|[1][0-2]):[0-5][0-9]\s(AM|PM)", time):
             raise ValueError("Time must be in format HH:MM AM or HH:MM PM")
         else:
             self._time = time
@@ -232,5 +232,5 @@ class Session(Helper):
 
 
 
-from trainer import Trainer
-from client import Client
+from models.trainer import Trainer
+from models.client import Client
