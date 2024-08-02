@@ -305,15 +305,13 @@ def add_new_session():
         and Trainer.find_by_id(trainer_id)
         and len(date)
         and len(time)
-        and re.match(r"([0][1-9]|[1][0-2])\/([0][1-9]|[12][0-9]|[3][01])\/\d{4}", date)
-        and re.match(r"([0][0-9]|[1][0-2]):[0-5][0-9]\s(AM|PM)", time)
-    ):
+        ):
         try:
             session = Session.create(
                 date, time, int(client_id), int(trainer_id)
             )
-            print(session)
+            cprint(f"Successfully created {session}", 'green')
         except Exception as e:
             print(colored(f"Error creating appointment: {e}", "red"))
     else:
-        print("Invalid date, time, client id, or trainer id")
+        cprint("Invalid date, time, client id, or trainer id", 'red')

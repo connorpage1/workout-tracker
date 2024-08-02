@@ -27,7 +27,6 @@ def main():
     welcome_menu()
     time.sleep(1)
     while True:
-        time.sleep(1)
         menu()
         choice = input("> ")
         if choice == "0":
