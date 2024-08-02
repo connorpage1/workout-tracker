@@ -56,6 +56,20 @@ class Trainer(Helper):
         else:
             self._specialty = new_specialty
         
+    def sessions(self):
+        CURSOR.execute(
+            """
+            SELECT * FROM sessions
+            WHERE trainer_id = ?
+        """,
+            (self.id,),
+        )
+        rows = CURSOR.fetchall()
+        return [Session(row[1], row[2], row[3], row[4], row[0]) for row in rows]    
+    
+    def patients(self):
+        return list({session.patient() for session in self.sessions()})
+    
     @classmethod
     def create_table(cls):
         try:
@@ -92,10 +106,45 @@ class Trainer(Helper):
         return new_trainer
     
     @classmethod
+    def new_from_db(cls):
+        CURSOR.execute(
+            """
+            SELECT * FROM trainers
+            ORDER BY id DESC
+            LIMIT 1;
+        """
+        )
+        row = CURSOR.fetchone()
+        return cls(row[1], row[2], row[3], row[0])
+    
+    @classmethod
+    def get_all(cls):
+        CURSOR.execute(
+            """
+            SELECT * FROM trainers; 
+        """
+        )
+        rows = CURSOR.fetchall()
+        return [cls(row[1], row[2], row[3], row[0]) for row in rows]   
+    
+    @classmethod
+    def find_by_name(cls, first_name, last_name):
+        CURSOR.execute(
+            """
+            SELECT * FROM doctors
+            WHERE first_name is ?
+            AND last_name is ?;
+        """,
+            (first_name, last_name),
+        )
+        row = CURSOR.fetchone()
+        return cls(row[1], row[2], row[3], row[0]) if row else None
+    
+    @classmethod
     def find_by_id(cls, id):
         CURSOR.execute(
             """
-            SELECT * FROM clients
+            SELECT * FROM trainers
             WHERE id is ?;
         """,
             (id,),
@@ -103,10 +152,16 @@ class Trainer(Helper):
         row = CURSOR.fetchone()
         return cls(row[1], row[2], row[3], row[0]) if row else None
     
+    @classmethod
+    def find_or_create_by(cls, first_name, last_name, specialty):
+        return cls.find_by_name(first_name, last_name) or cls.create(
+            first_name, last_name, specialty
+        )
+
     def update(self):
         CURSOR.execute(
             """
-            UPDATE clients
+            UPDATE trainers
             SET first_name = ?, last_name = ?, specialty = ?
             WHERE id = ?
         """,
@@ -115,6 +170,7 @@ class Trainer(Helper):
         CONN.commit()
         type(self).all[self] = self
         return self
+    
     def save(self):
         try:
             with CONN:
@@ -129,4 +185,6 @@ class Trainer(Helper):
                 self.id = CURSOR.lastrowid
                 type(self).all_[self.id] = self
         except sqlite3.IntegrityError as e:
-            return e
+            raise e
+
+from session import Session

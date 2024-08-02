@@ -17,13 +17,15 @@ if __name__ == "__main__":
     Session.create_table()
     
     trainer_specialties = ["Strength", "Cardio", "Bodybuilding", "Crossfit", "Physical Therapy", "Weight Loss", "Water Aerobics", "Yoga"]
+    email_endings = ["@yahoo.com", "@outlook.com", "@flatironschool.org", "@gmail.com", "@outlook.com"]
     
     for _ in range(10):
         first_name = fake.first_name()
         last_name = fake.last_name()
         
-        email_endings = ["@yahoo.com", "@outlook.com", "@flatironschool.org", "@gmail.com", "@outlook.com"]
         Client.create(first_name, last_name, f"{first_name}.{last_name}{random.choice(email_endings)}")
         
     for _ in range(10):
         Trainer.create(fake.first_name(), fake.last_name(), random.choice(trainer_specialties))
+    
+    
